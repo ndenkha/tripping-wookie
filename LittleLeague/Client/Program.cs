@@ -11,28 +11,10 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            //AddPlayers();
-            //RegisterPlayers();
-        }
-
-        static void AddPlayers()
-        {
             using (var db = new DbContext())
             {
-                db.Players.Add(new Player("John", "Doe"));
-                db.SaveChanges();
-            }
-        }
-
-        static void RegisterPlayers()
-        {
-            using (var db = new DbContext())
-            {
-                foreach (var player in db.Players)
-                {
-                    player.Register();
-                }
-
+                var team = db.Teams.Add(new Team("Hawks"));
+                team.Players.Add(new Player("John", "Doe"));
                 db.SaveChanges();
             }
         }

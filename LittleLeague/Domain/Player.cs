@@ -12,6 +12,8 @@ namespace Domain
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
         public bool IsRegistered { get; private set; }
+        public int TeamId { get; private set; }
+        public Team Team { get; private set; }
 
         public Player()
         {
@@ -19,8 +21,8 @@ namespace Domain
 
         public Player(string firstName, string lastName)
         {
-            FirstName = firstName;
-            LastName = lastName;
+            this.FirstName = firstName;
+            this.LastName = lastName;
         }
 
         public void Register()
