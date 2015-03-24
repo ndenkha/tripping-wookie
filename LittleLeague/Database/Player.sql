@@ -5,5 +5,6 @@
     [LastName] VARCHAR(50) NOT NULL, 
     [IsRegistered] BIT NOT NULL, 
     [TeamId] INT NOT NULL, 
+    [RegistrationDate] DATETIME NULL, 
     CONSTRAINT [FK_Player_Team] FOREIGN KEY ([TeamId]) REFERENCES [Team]([TeamId]) ON DELETE CASCADE
 )

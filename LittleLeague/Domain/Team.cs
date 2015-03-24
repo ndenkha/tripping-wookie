@@ -14,6 +14,7 @@ namespace Domain
 
         public Team()
         {
+            //For use by entity framework only.
         }
 
         public Team(string name)
