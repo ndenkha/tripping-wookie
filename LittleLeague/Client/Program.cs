@@ -54,7 +54,7 @@ namespace Client
             using (var db = new DbContext("TestUser2", serviceProvider))
             {
                 var team = db.Teams.Add(new Team("Hawks", serviceProvider));
-                team.AddPlayer(new Player("John", "Doe", serviceProvider));
+                team.AddPlayer(new Player("John", "Doe", team, serviceProvider));
                 db.SaveChanges();
             }
             log.Debug("Team and player created.");
