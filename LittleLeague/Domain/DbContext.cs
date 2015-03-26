@@ -16,7 +16,6 @@ namespace Domain
         string user;
         IServiceProvider serviceProvider;
 
-        public IDbSet<Player> Players { get; set; }
         public IDbSet<Team> Teams { get; set; }
 
         public DbContext(string user, IServiceProvider serviceProvider)
