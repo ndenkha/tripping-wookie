@@ -5,22 +5,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using Ninject;
+using log4net;
 
 namespace Client
 {
     class Program
     {
-        static void Main(string[] args)
+        ILog log;
+        StandardKernel serviceProvider;
+
+        Program()
         {
-            CreateTeamAndPlayer();
-            RegisterPlayers();
+            log = log4net.LogManager.GetLogger("LittleLeagueLog"); 
+
+            serviceProvider = new StandardKernel();
+            serviceProvider.Bind<ILog>().ToConstant(log);
         }
 
-        static void RegisterPlayers()
+        static void Main(string[] args)
+        {
+            var program = new Program();
+            program.CreateTeamAndPlayer();
+            program.RegisterPlayers();
+        }
+
+        void RegisterPlayers()
         {
             using (var scope = new TransactionScope())
             {
-                using (var db = new DbContext())
+                using (var db = new DbContext("TestUser1", serviceProvider))
                 {
 
                     var team = db.Teams.Where(x => x.Name == "Hawks").Single();
@@ -30,17 +44,20 @@ namespace Client
                     }
                     db.SaveChanges();
                 }
+                scope.Complete();
             }
+            log.Debug("Registered players.");
         }
 
-        static void CreateTeamAndPlayer()
+        void CreateTeamAndPlayer()
         {
-            using (var db = new DbContext())
+            using (var db = new DbContext("TestUser2", serviceProvider))
             {
-                var team = db.Teams.Add(new Team("Hawks"));
-                team.Players.Add(new Player("John", "Doe"));
+                var team = db.Teams.Add(new Team("Hawks", serviceProvider));
+                team.AddPlayer(new Player("John", "Doe", serviceProvider));
                 db.SaveChanges();
             }
+            log.Debug("Team and player created.");
         }
     }
 }
