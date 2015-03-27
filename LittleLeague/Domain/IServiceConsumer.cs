@@ -8,6 +8,6 @@ namespace Domain
 {
     public interface IServiceConsumer
     {
-        void Accept(IServiceLocator serviceLocator);
+        void Accept(IServiceProvider serviceProvider);
     }
 }

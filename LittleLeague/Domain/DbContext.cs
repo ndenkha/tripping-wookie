@@ -15,15 +15,15 @@ namespace Domain
     {
         bool injectDependencies;
         string user;
-        IServiceLocator serviceLocator;
+        IServiceProvider serviceProvider;
 
         public IDbSet<Team> Teams { get; set; }
 
-        public DbContext(string user, IServiceLocator serviceLocator, bool injectDependencies)
+        public DbContext(string user, IServiceProvider serviceProvider, bool injectDependencies)
             : base("LittleLeague")
         {
             this.user = user;
-            this.serviceLocator = serviceLocator;
+            this.serviceProvider = serviceProvider;
             this.injectDependencies = injectDependencies;
 
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
@@ -85,7 +85,7 @@ namespace Domain
 
             if (e.Entity is IServiceConsumer)
             {
-                (e.Entity as IServiceConsumer).Accept(serviceLocator);
+                (e.Entity as IServiceConsumer).Accept(serviceProvider);
             }
         }
     }

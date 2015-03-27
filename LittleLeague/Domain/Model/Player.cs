@@ -28,12 +28,12 @@ namespace Domain.Model
             //For use by entity framework only.
         }
 
-        public Player(string firstName, string lastName, Team team, IServiceLocator serviceLocator)
+        public Player(string firstName, string lastName, Team team, IServiceProvider serviceProvider)
         {
             this.FirstName = firstName;
             this.LastName = lastName;
             this.Team = team;
-            ((IServiceConsumer)this).Accept(serviceLocator);
+            ((IServiceConsumer)this).Accept(serviceProvider);
         }
 
         public void Register()
@@ -50,9 +50,9 @@ namespace Domain.Model
             log.Debug("Unregistered.");
         }
 
-        void IServiceConsumer.Accept(IServiceLocator serviceLocator)
+        void IServiceConsumer.Accept(IServiceProvider serviceProvider)
         {
-            log = serviceLocator.GetService<ILog>();
+            log = serviceProvider.GetService<ILog>();
         }
     }
 }
