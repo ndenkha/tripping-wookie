@@ -8,23 +8,20 @@ using System.Data.Entity.ModelConfiguration;
 using System.Data.Entity.Infrastructure;
 using log4net;
 using Domain.Model;
+using System.Threading;
 
 namespace Domain
 {
     public class DbContext : System.Data.Entity.DbContext
     {
-        bool injectDependencies;
-        string user;
         IServiceProvider serviceProvider;
 
         public IDbSet<Team> Teams { get; set; }
 
-        public DbContext(string user, IServiceProvider serviceProvider, bool injectDependencies)
+        public DbContext(IServiceProvider serviceProvider)
             : base("LittleLeague")
         {
-            this.user = user;
             this.serviceProvider = serviceProvider;
-            this.injectDependencies = injectDependencies;
 
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
         }
@@ -45,15 +42,15 @@ namespace Domain
                     var auditable = (IAuditable)item.Entity;
                     if (item.State == EntityState.Added)
                     {
-                        auditable.CreatedBy = user;
+                        auditable.CreatedBy = Thread.CurrentPrincipal.Identity.Name;
                         auditable.CreatedDate = DateTime.UtcNow;
-                        auditable.LastUpdatedBy = user;
+                        auditable.LastUpdatedBy = Thread.CurrentPrincipal.Identity.Name;
                         auditable.LastUpdatedDate = DateTime.UtcNow;
                     }
 
                     if (item.State == EntityState.Modified)
                     {
-                        auditable.LastUpdatedBy = user;
+                        auditable.LastUpdatedBy = Thread.CurrentPrincipal.Identity.Name;
                         auditable.LastUpdatedDate = DateTime.UtcNow;
                     }
                 }
@@ -81,8 +78,6 @@ namespace Domain
 
         void ObjectContext_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
         {
-            if (!injectDependencies) return;
-
             if (e.Entity is IServiceConsumer)
             {
                 (e.Entity as IServiceConsumer).Accept(serviceProvider);

@@ -8,6 +8,8 @@ using System.Transactions;
 using Ninject;
 using log4net;
 using Domain.Model;
+using System.Threading;
+using System.Security.Principal;
 
 namespace Client
 {
@@ -35,9 +37,11 @@ namespace Client
 
         void RegisterPlayers()
         {
+            Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("TestUser1", "Generic"), new string [] { "User" });
+
             using (var scope = new TransactionScope())
             {
-                using (var db = new DbContext("TestUser1", serviceProvider, true))
+                using (var db = new DbContext(serviceProvider))
                 {
 
                     var team = db.Teams.Where(x => x.Name == "Hawks").Single();
@@ -54,7 +58,9 @@ namespace Client
 
         void CreateTeamAndPlayer()
         {
-            using (var db = new DbContext("TestUser2", serviceProvider, true))
+            Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("TestUser1", "Generic"), new string[] { "User" });
+
+            using (var db = new DbContext(serviceProvider))
             {
                 var team = db.Teams.Add(new Team("Hawks", serviceProvider));
                 team.AddPlayer(new Player("John", "Doe", team, serviceProvider));
