@@ -43,12 +43,10 @@ namespace Client
             {
                 using (var db = new DbContext(serviceProvider))
                 {
-
                     var team = db.Teams.Where(x => x.Name == "Hawks").Single();
-                    foreach (var player in team.Players)
-                    {
-                        player.Register();
-                    }
+                    
+                    team.Players.ForEach(player => player.Register());
+                    
                     db.SaveChanges();
                 }
                 scope.Complete();

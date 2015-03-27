@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="DbContext.cs" />
     <Compile Include="IAuditable.cs" />
+    <Compile Include="IEnumerableExtensions.cs" />
     <Compile Include="IServiceConsumer.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
