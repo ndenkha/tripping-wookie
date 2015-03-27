@@ -13,16 +13,18 @@ namespace Domain
 {
     public class DbContext : System.Data.Entity.DbContext
     {
+        bool injectDependencies;
         string user;
         IServiceProvider serviceProvider;
 
         public IDbSet<Team> Teams { get; set; }
 
-        public DbContext(string user, IServiceProvider serviceProvider)
+        public DbContext(string user, IServiceProvider serviceProvider, bool injectDependencies)
             : base("LittleLeague")
         {
             this.user = user;
             this.serviceProvider = serviceProvider;
+            this.injectDependencies = injectDependencies;
 
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
         }
@@ -79,6 +81,8 @@ namespace Domain
 
         void ObjectContext_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
         {
+            if (!injectDependencies) return;
+
             if (e.Entity is IServiceConsumer)
             {
                 (e.Entity as IServiceConsumer).Accept(serviceProvider);

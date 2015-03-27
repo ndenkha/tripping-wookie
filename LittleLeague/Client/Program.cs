@@ -34,7 +34,7 @@ namespace Client
         {
             using (var scope = new TransactionScope())
             {
-                using (var db = new DbContext("TestUser1", serviceProvider))
+                using (var db = new DbContext("TestUser1", serviceProvider, true))
                 {
 
                     var team = db.Teams.Where(x => x.Name == "Hawks").Single();
@@ -51,7 +51,7 @@ namespace Client
 
         void CreateTeamAndPlayer()
         {
-            using (var db = new DbContext("TestUser2", serviceProvider))
+            using (var db = new DbContext("TestUser2", serviceProvider, true))
             {
                 var team = db.Teams.Add(new Team("Hawks", serviceProvider));
                 team.AddPlayer(new Player("John", "Doe", team, serviceProvider));
