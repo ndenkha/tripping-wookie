@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain
+namespace Domain.Model
 {
     public class Team : IServiceConsumer, IAuditable
     {
@@ -19,7 +19,7 @@ namespace Domain
         public string LastUpdatedBy { get; set; }
         public DateTime LastUpdatedDate { get; set; }
 
-        public Team()
+        private Team()
         {
             //For use by entity framework only.
         }
