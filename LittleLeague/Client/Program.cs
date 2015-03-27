@@ -13,14 +13,16 @@ namespace Client
     class Program
     {
         ILog log;
-        StandardKernel serviceProvider;
+        IServiceLocator serviceLocator;
 
         Program()
         {
             log = log4net.LogManager.GetLogger("LittleLeagueLog"); 
 
-            serviceProvider = new StandardKernel();
-            serviceProvider.Bind<ILog>().ToConstant(log);
+            var kernel = new StandardKernel();
+            kernel.Bind<ILog>().ToConstant(log);
+
+            serviceLocator = new ServiceLocator(kernel);
         }
 
         static void Main(string[] args)
@@ -34,7 +36,7 @@ namespace Client
         {
             using (var scope = new TransactionScope())
             {
-                using (var db = new DbContext("TestUser1", serviceProvider, true))
+                using (var db = new DbContext("TestUser1", serviceLocator, true))
                 {
 
                     var team = db.Teams.Where(x => x.Name == "Hawks").Single();
@@ -51,10 +53,10 @@ namespace Client
 
         void CreateTeamAndPlayer()
         {
-            using (var db = new DbContext("TestUser2", serviceProvider, true))
+            using (var db = new DbContext("TestUser2", serviceLocator, true))
             {
-                var team = db.Teams.Add(new Team("Hawks", serviceProvider));
-                team.AddPlayer(new Player("John", "Doe", team, serviceProvider));
+                var team = db.Teams.Add(new Team("Hawks", serviceLocator));
+                team.AddPlayer(new Player("John", "Doe", team, serviceLocator));
                 db.SaveChanges();
             }
             log.Debug("Team and player created.");

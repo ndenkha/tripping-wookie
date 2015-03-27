@@ -24,11 +24,11 @@ namespace Domain
             //For use by entity framework only.
         }
 
-        public Team(string name, IServiceProvider serviceProvider)
+        public Team(string name, IServiceLocator serviceLocator)
         {
             this.Name = name;
             this.Players = new List<Player>();
-            ((IServiceConsumer)this).Accept(serviceProvider);
+            ((IServiceConsumer)this).Accept(serviceLocator);
         }
 
         public Player AddPlayer(Player player)
@@ -38,9 +38,9 @@ namespace Domain
             return player;
         }
 
-        void IServiceConsumer.Accept(IServiceProvider serviceProvider)
+        void IServiceConsumer.Accept(IServiceLocator serviceLocator)
         {
-            log = (ILog)serviceProvider.GetService(typeof(ILog));
+            log = serviceLocator.GetService<ILog>();
         }
     }
 }

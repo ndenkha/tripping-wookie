@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 using System.Data.Entity.Infrastructure;
-using Ninject;
 using log4net;
 
 namespace Domain
@@ -15,15 +14,15 @@ namespace Domain
     {
         bool injectDependencies;
         string user;
-        IServiceProvider serviceProvider;
+        IServiceLocator serviceLocator;
 
         public IDbSet<Team> Teams { get; set; }
 
-        public DbContext(string user, IServiceProvider serviceProvider, bool injectDependencies)
+        public DbContext(string user, IServiceLocator serviceLocator, bool injectDependencies)
             : base("LittleLeague")
         {
             this.user = user;
-            this.serviceProvider = serviceProvider;
+            this.serviceLocator = serviceLocator;
             this.injectDependencies = injectDependencies;
 
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
@@ -85,7 +84,7 @@ namespace Domain
 
             if (e.Entity is IServiceConsumer)
             {
-                (e.Entity as IServiceConsumer).Accept(serviceProvider);
+                (e.Entity as IServiceConsumer).Accept(serviceLocator);
             }
         }
     }
