@@ -32,11 +32,11 @@ namespace Domain.Model
             ((IDependencyConsumer)this).Accept(kernel);
         }
 
-        public Player AddPlayer(Player player)
+        public Team AddPlayer(Player player)
         {
             this.Players.Add(player);
-            log.InfoFormat("Player {0} {1} added.", player.FirstName, player.LastName);
-            return player;
+            log.InfoFormat("Player {0} {1} added to {2}.", player.FirstName, player.LastName, Name);
+            return this;
         }
 
         public void RegisterPlayers()

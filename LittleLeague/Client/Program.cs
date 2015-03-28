@@ -60,8 +60,20 @@ namespace Client
             Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("TestUser1", "Generic"), new string[] { "User" });
             using (var db = new DbContext(kernel))
             {
-                var team = db.Teams.Add(new Team("Hawks", kernel));
-                team.AddPlayer(new Player("John", "Doe", team, kernel));
+                var team = db.Teams.Add(new Team("Cowboys", kernel));
+                team.AddPlayer(new Player("Ray", "Agnew", team, kernel))
+                    .AddPlayer(new Player("Dan", "Bailey", team, kernel))
+                    .AddPlayer(new Player("Cole", "Beasley", team, kernel))
+                    .AddPlayer(new Player("Machenzy", "Bernadeau", team, kernel))
+                    .AddPlayer(new Player("Ken", "Bishop", team, kernel));
+
+                team = db.Teams.Add(new Team("Giants", kernel));
+                team.AddPlayer(new Player("Prince", "Amukamara", team, kernel))
+                    .AddPlayer(new Player("Robert", "Ayers Jr.", team, kernel))
+                    .AddPlayer(new Player("Michael", "Bamiro", team, kernel))
+                    .AddPlayer(new Player("Jon", "Beason", team, kernel))
+                    .AddPlayer(new Player("Will", "Beatty", team, kernel));
+
                 db.SaveChanges();
             }
             log.Info("Teams and players created.");
@@ -90,6 +102,7 @@ namespace Client
 
         void ReadTeamsAndPlayers()
         {
+            log.Info("Reading players...");
             // Injection will not be used because we are using the default constructor of DbContext.
             using (var db = new DbContext())
             {

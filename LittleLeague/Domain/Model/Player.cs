@@ -41,14 +41,14 @@ namespace Domain.Model
         {
             IsRegistered = true;
             RegistrationDate = DateTime.UtcNow;
-            log.Info("Registered.");
+            log.InfoFormat("Registered {0} {1}.", FirstName, LastName);
         }
 
         public void UnRegister()
         {
             IsRegistered = false;
             RegistrationDate = null;
-            log.Info("Unregistered.");
+            log.InfoFormat("Unregistered {0} {1}.", FirstName, LastName);
         }
 
         void IDependencyConsumer.Accept(IKernel kernel)
