@@ -19,7 +19,7 @@ namespace Domain.Model
         public string LastUpdatedBy { get; set; }
         public DateTime LastUpdatedDate { get; set; }
 
-        private Team()
+        Team()
         {
             //For use by entity framework only.
         }
@@ -36,6 +36,12 @@ namespace Domain.Model
             this.Players.Add(player);
             log.InfoFormat("Player {0} {1} added.", player.FirstName, player.LastName);
             return player;
+        }
+
+        public void RegisterPlayers()
+        {
+            var unregisteredPlayers = Players.Where(x => x.IsRegistered == false);
+            unregisteredPlayers.ForEach(player => player.Register());
         }
 
         void IServiceConsumer.Accept(IServiceProvider serviceProvider)

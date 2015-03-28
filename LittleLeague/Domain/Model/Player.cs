@@ -23,7 +23,7 @@ namespace Domain.Model
         public string LastUpdatedBy { get; set; }
         public DateTime LastUpdatedDate { get; set; }
 
-        private Player()
+        Player()
         {
             //For use by entity framework only.
         }

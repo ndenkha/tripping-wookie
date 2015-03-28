@@ -79,8 +79,10 @@ namespace Client
             {
                 using (var db = new DbContext(serviceProvider))
                 {
-                    var team = db.Teams.Where(x => x.Name == "Hawks").Include(x=>x.Players).Single();
-                    team.Players.ForEach(player => player.Register());
+                    //db.Teams.Include(x=>x.Players).ForEach(team => team.RegisterPlayers());
+                    db.Teams
+                        .Include(team=>team.Players)
+                        .ForEach(team => team.RegisterPlayers());
                     db.SaveChanges();
                 }
                 scope.Complete();
