@@ -20,17 +20,15 @@ namespace Client
     class Program
     {
         ILog log;
-        IServiceProvider serviceProvider;
+        IKernel kernel;
 
         Program()
         {
             log4net.Config.XmlConfigurator.Configure();
             log = log4net.LogManager.GetLogger("LittleLeagueLog"); 
 
-            var kernel = new StandardKernel();
+            kernel = new StandardKernel();
             kernel.Bind<ILog>().ToConstant(log);
-
-            serviceProvider = kernel;
         }
 
         static void Main(string[] args)
@@ -48,7 +46,7 @@ namespace Client
 
         void DeleteTeams()
         {
-            using (var db = new DbContext(serviceProvider))
+            using (var db = new DbContext(kernel))
             {
                 db.Teams.ForEach(team => db.Teams.Remove(team));
                 db.SaveChanges();
@@ -60,10 +58,10 @@ namespace Client
         {
             // Setting up a different principle to illustrate how createBy and lastUpdateBy varies in the database.
             Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("TestUser1", "Generic"), new string[] { "User" });
-            using (var db = new DbContext(serviceProvider))
+            using (var db = new DbContext(kernel))
             {
-                var team = db.Teams.Add(new Team("Hawks", serviceProvider));
-                team.AddPlayer(new Player("John", "Doe", team, serviceProvider));
+                var team = db.Teams.Add(new Team("Hawks", kernel));
+                team.AddPlayer(new Player("John", "Doe", team, kernel));
                 db.SaveChanges();
             }
             log.Info("Teams and players created.");
@@ -77,7 +75,7 @@ namespace Client
             // An example of transaction scope being used.
             using (var scope = new TransactionScope())
             {
-                using (var db = new DbContext(serviceProvider))
+                using (var db = new DbContext(kernel))
                 {
                     //db.Teams.Include(x=>x.Players).ForEach(team => team.RegisterPlayers());
                     db.Teams
