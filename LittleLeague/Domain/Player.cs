@@ -40,14 +40,14 @@ namespace Domain
         {
             IsRegistered = true;
             RegistrationDate = DateTime.UtcNow;
-            log.Debug("Registered.");
+            log.Info("Registered.");
         }
 
         public void UnRegister()
         {
             IsRegistered = false;
             RegistrationDate = null;
-            log.Debug("Unregistered.");
+            log.Info("Unregistered.");
         }
 
         void IServiceConsumer.Accept(IServiceLocator serviceLocator)

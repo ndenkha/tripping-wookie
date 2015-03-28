@@ -12,20 +12,24 @@ namespace Domain
 {
     public class DbContext : System.Data.Entity.DbContext
     {
-        bool injectDependencies;
         string user;
         IServiceLocator serviceLocator;
 
         public IDbSet<Team> Teams { get; set; }
 
-        public DbContext(string user, IServiceLocator serviceLocator, bool injectDependencies)
-            : base("LittleLeague")
+        // Should be used for write scenarios.
+        public DbContext(string user, IServiceLocator serviceLocator)
+            : this()
         {
             this.user = user;
             this.serviceLocator = serviceLocator;
-            this.injectDependencies = injectDependencies;
-
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
+        }
+
+        // Should only be used for readonly scenarios.
+        public DbContext()
+            : base("LittleLeague")
+        {
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -80,8 +84,6 @@ namespace Domain
 
         void ObjectContext_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
         {
-            if (!injectDependencies) return;
-
             if (e.Entity is IServiceConsumer)
             {
                 (e.Entity as IServiceConsumer).Accept(serviceLocator);

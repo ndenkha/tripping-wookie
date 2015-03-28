@@ -34,7 +34,7 @@ namespace Domain
         public Player AddPlayer(Player player)
         {
             this.Players.Add(player);
-            log.DebugFormat("Player {0} {1} added.", player.FirstName, player.LastName);
+            log.InfoFormat("Player {0} {1} added.", player.FirstName, player.LastName);
             return player;
         }
 

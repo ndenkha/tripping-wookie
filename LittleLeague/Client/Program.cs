@@ -7,9 +7,13 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Ninject;
 using log4net;
+using System.Data.Entity;
 
 namespace Client
 {
+    using DbContext = Domain.DbContext;
+    using log4net.Config;
+
     class Program
     {
         ILog log;
@@ -17,7 +21,8 @@ namespace Client
 
         Program()
         {
-            log = log4net.LogManager.GetLogger("LittleLeagueLog"); 
+            log4net.Config.XmlConfigurator.Configure();
+            log = log4net.LogManager.GetLogger("LittleLeagueLog");
 
             var kernel = new StandardKernel();
             kernel.Bind<ILog>().ToConstant(log);
@@ -28,15 +33,45 @@ namespace Client
         static void Main(string[] args)
         {
             var program = new Program();
-            program.CreateTeamAndPlayer();
+            program.DeleteTeams();
+            program.CreateTeamsAndPlayers();
             program.RegisterPlayers();
+            program.ReadTeamsAndPlayers();
+
+            Console.WriteLine();
+            Console.WriteLine("Done.");
+            Console.ReadKey(true);
+        }
+
+        void DeleteTeams()
+        {
+            using (var db = new DbContext("TestUser2", serviceLocator))
+            {
+                foreach (var team in db.Teams)
+                {
+                    db.Teams.Remove(team);
+                }
+                db.SaveChanges();
+            }
+            log.Info("Deleted teams.");
+        }
+
+        void CreateTeamsAndPlayers()
+        {
+            using (var db = new DbContext("TestUser2", serviceLocator))
+            {
+                var team = db.Teams.Add(new Team("Hawks", serviceLocator));
+                team.AddPlayer(new Player("John", "Doe", team, serviceLocator));
+                db.SaveChanges();
+            }
+            log.Info("Teams and players created.");
         }
 
         void RegisterPlayers()
         {
             using (var scope = new TransactionScope())
             {
-                using (var db = new DbContext("TestUser1", serviceLocator, true))
+                using (var db = new DbContext("TestUser1", serviceLocator))
                 {
 
                     var team = db.Teams.Where(x => x.Name == "Hawks").Single();
@@ -48,18 +83,22 @@ namespace Client
                 }
                 scope.Complete();
             }
-            log.Debug("Registered players.");
+            log.Info("Registered players.");
         }
 
-        void CreateTeamAndPlayer()
+        void ReadTeamsAndPlayers()
         {
-            using (var db = new DbContext("TestUser2", serviceLocator, true))
+            using (var db = new DbContext())
             {
-                var team = db.Teams.Add(new Team("Hawks", serviceLocator));
-                team.AddPlayer(new Player("John", "Doe", team, serviceLocator));
-                db.SaveChanges();
+                foreach (var team in db.Teams.Include(x => x.Players))
+                {
+                    log.Info("# Team: " + team.Name);
+                    foreach (var player in team.Players)
+                    {
+                        log.InfoFormat("  - Player: {0} {1}", player.FirstName, player.LastName);
+                    }
+                }
             }
-            log.Debug("Team and player created.");
         }
     }
 }
