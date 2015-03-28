@@ -52,7 +52,7 @@ namespace Domain.Model
 
         void IServiceConsumer.Accept(IServiceProvider serviceProvider)
         {
-            log = serviceProvider.GetService<ILog>();
+            log = (ILog)serviceProvider.GetService(typeof(ILog));
         }
     }
 }
