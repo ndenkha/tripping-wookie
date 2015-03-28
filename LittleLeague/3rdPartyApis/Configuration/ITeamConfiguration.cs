@@ -1,7 +1,8 @@
 ﻿using System;
+
 namespace _3rdPartyApis.Configuration
 {
-    interface ITeamConfiguration
+    public interface ITeamConfiguration
     {
         int GetMaxPlayerCount(string teamName);
     }

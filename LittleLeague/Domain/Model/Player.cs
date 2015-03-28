@@ -35,14 +35,13 @@ namespace Domain.Model
         {
             IsRegistered = true;
             RegistrationDate = DateTime.UtcNow;
-            log.InfoFormat("Registered {0} {1}.", FirstName, LastName);
+            eventPublisher.Publish(string.Format("Registered {0} {1}.", FirstName, LastName));
         }
 
         public void UnRegister()
         {
             IsRegistered = false;
-            RegistrationDate = null;
-            log.InfoFormat("Unregistered {0} {1}.", FirstName, LastName);
+            RegistrationDate = null; eventPublisher.Publish(string.Format("Unregistered {0} {1}.", FirstName, LastName));
         }
     }
 }

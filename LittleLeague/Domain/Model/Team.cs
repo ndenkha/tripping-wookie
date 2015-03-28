@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using _3rdPartyApis.Configuration;
+using log4net;
 using Ninject;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace Domain.Model
 {
     public class Team : EntityBase
     {
+        ITeamConfiguration teamConfiguration;
+
         public int TeamId { get; private set; }
         public string Name { get; private set; }
         public virtual ICollection<Player> Players { get; private set; }
@@ -28,8 +31,9 @@ namespace Domain.Model
 
         public Team AddPlayer(Player player)
         {
+            EnforceMaxPlayerLimit();
             this.Players.Add(player);
-            log.InfoFormat("Player {0} {1} added to {2}.", player.FirstName, player.LastName, Name);
+            eventPublisher.Publish(string.Format("Player {0} {1} added to {2}.", player.FirstName, player.LastName, Name));
             return this;
         }
 
@@ -37,6 +41,18 @@ namespace Domain.Model
         {
             var unregisteredPlayers = Players.Where(x => x.IsRegistered == false);
             unregisteredPlayers.ForEach(player => player.Register());
+        }
+
+        protected override void Accept(IKernel kernel)
+        {
+            teamConfiguration = (ITeamConfiguration)kernel.Get(typeof(ITeamConfiguration));
+            base.Accept(kernel);
+        }
+
+        void EnforceMaxPlayerLimit()
+        {
+            if (this.Players.Count() >= teamConfiguration.GetMaxPlayerCount(Name))
+                throw new Exception("Player count may not exceed max configuration for team.");
         }
     }
 }

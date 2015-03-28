@@ -12,6 +12,8 @@ using Domain.Model;
 using System.Threading;
 using System.Security.Principal;
 using System.Data.Entity;
+using _3rdPartyApis.Configuration;
+using _3rdPartyApis.Eventing;
 
 namespace Client
 {
@@ -25,10 +27,12 @@ namespace Client
         Program()
         {
             log4net.Config.XmlConfigurator.Configure();
-            log = log4net.LogManager.GetLogger("LittleLeagueLog"); 
+            log = log4net.LogManager.GetLogger("Default"); 
 
             kernel = new StandardKernel();
             kernel.Bind<ILog>().ToConstant(log);
+            kernel.Bind<ITeamConfiguration>().To<TeamConfiguration>();
+            kernel.Bind<IEventPublisher>().To<EventPublisher>();
         }
 
         static void Main(string[] args)

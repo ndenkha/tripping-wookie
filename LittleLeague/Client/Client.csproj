@@ -65,6 +65,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\3rdPartyApis\3rdPartyApis.csproj">
+      <Project>{ecb59e96-4ac7-406c-a33a-f49831746a81}</Project>
+      <Name>3rdPartyApis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Domain\Domain.csproj">
       <Project>{87d16626-854e-41c2-8944-aeb299583892}</Project>
       <Name>Domain</Name>
