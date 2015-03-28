@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{87D16626-854E-41C2-8944-AEB299583892}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{B5DDA4E3-6DF1-4E22-A11C-0FD07289EE1E}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{63FB7D9D-2943-4AEF-BD55-F380692CE756}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "3rdPartyApis", "3rdPartyApis\3rdPartyApis.csproj", "{ECB59E96-4AC7-406C-A33A-F49831746A81}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{63FB7D9D-2943-4AEF-BD55-F380692CE756}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63FB7D9D-2943-4AEF-BD55-F380692CE756}.Release|Any CPU.Build.0 = Release|Any CPU
 		{63FB7D9D-2943-4AEF-BD55-F380692CE756}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{ECB59E96-4AC7-406C-A33A-F49831746A81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECB59E96-4AC7-406C-A33A-F49831746A81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECB59E96-4AC7-406C-A33A-F49831746A81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECB59E96-4AC7-406C-A33A-F49831746A81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
