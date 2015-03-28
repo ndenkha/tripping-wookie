@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Model
 {
-    public class Player : IServiceConsumer, IAuditable
+    public class Player : IDependencyConsumer, IAuditable
     {
         ILog log;
 
@@ -28,12 +29,12 @@ namespace Domain.Model
             //For use by entity framework only.
         }
 
-        public Player(string firstName, string lastName, Team team, IServiceProvider serviceProvider)
+        public Player(string firstName, string lastName, Team team, IKernel kernel)
         {
             this.FirstName = firstName;
             this.LastName = lastName;
             this.Team = team;
-            ((IServiceConsumer)this).Accept(serviceProvider);
+            ((IDependencyConsumer)this).Accept(kernel);
         }
 
         public void Register()
@@ -50,9 +51,9 @@ namespace Domain.Model
             log.Info("Unregistered.");
         }
 
-        void IServiceConsumer.Accept(IServiceProvider serviceProvider)
+        void IDependencyConsumer.Accept(IKernel kernel)
         {
-            log = (ILog)serviceProvider.GetService(typeof(ILog));
+            log = (ILog)kernel.GetService(typeof(ILog));
         }
     }
 }

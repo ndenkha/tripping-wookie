@@ -9,20 +9,21 @@ using System.Data.Entity.Infrastructure;
 using log4net;
 using Domain.Model;
 using System.Threading;
+using Ninject;
 
 namespace Domain
 {
     public class DbContext : System.Data.Entity.DbContext
     {
-        readonly IServiceProvider serviceProvider;
+        readonly IKernel kernel;
 
         public IDbSet<Team> Teams { get; set; }
 
         // Should be used for write scenarios.
-        public DbContext(IServiceProvider serviceProvider)
+        public DbContext(IKernel serviceProvider)
             : this()
         {
-            this.serviceProvider = serviceProvider;
+            this.kernel = serviceProvider;
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
         }
 
@@ -84,9 +85,9 @@ namespace Domain
 
         void ObjectContext_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
         {
-            if (e.Entity is IServiceConsumer)
+            if (e.Entity is IDependencyConsumer)
             {
-                (e.Entity as IServiceConsumer).Accept(serviceProvider);
+                (e.Entity as IDependencyConsumer).Accept(kernel);
             }
         }
     }

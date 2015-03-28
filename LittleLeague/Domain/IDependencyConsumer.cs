@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ninject;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Domain
 {
-    public interface IServiceConsumer
+    public interface IDependencyConsumer
     {
-        void Accept(IServiceProvider serviceProvider);
+        void Accept(IKernel kernel);
     }
 }
