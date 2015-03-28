@@ -7,22 +7,22 @@ using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 using System.Data.Entity.Infrastructure;
 using log4net;
+using Domain.Model;
+using System.Threading;
 
 namespace Domain
 {
     public class DbContext : System.Data.Entity.DbContext
     {
-        string user;
-        IServiceLocator serviceLocator;
+        readonly IServiceProvider serviceProvider;
 
         public IDbSet<Team> Teams { get; set; }
 
         // Should be used for write scenarios.
-        public DbContext(string user, IServiceLocator serviceLocator)
+        public DbContext(IServiceProvider serviceProvider)
             : this()
         {
-            this.user = user;
-            this.serviceLocator = serviceLocator;
+            this.serviceProvider = serviceProvider;
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
         }
 
@@ -48,15 +48,15 @@ namespace Domain
                     var auditable = (IAuditable)item.Entity;
                     if (item.State == EntityState.Added)
                     {
-                        auditable.CreatedBy = user;
+                        auditable.CreatedBy = Thread.CurrentPrincipal.Identity.Name;
                         auditable.CreatedDate = DateTime.UtcNow;
-                        auditable.LastUpdatedBy = user;
+                        auditable.LastUpdatedBy = Thread.CurrentPrincipal.Identity.Name;
                         auditable.LastUpdatedDate = DateTime.UtcNow;
                     }
 
                     if (item.State == EntityState.Modified)
                     {
-                        auditable.LastUpdatedBy = user;
+                        auditable.LastUpdatedBy = Thread.CurrentPrincipal.Identity.Name;
                         auditable.LastUpdatedDate = DateTime.UtcNow;
                     }
                 }
@@ -86,7 +86,7 @@ namespace Domain
         {
             if (e.Entity is IServiceConsumer)
             {
-                (e.Entity as IServiceConsumer).Accept(serviceLocator);
+                (e.Entity as IServiceConsumer).Accept(serviceProvider);
             }
         }
     }

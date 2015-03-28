@@ -7,27 +7,30 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Ninject;
 using log4net;
+using log4net.Config;
+using Domain.Model;
+using System.Threading;
+using System.Security.Principal;
 using System.Data.Entity;
 
 namespace Client
 {
     using DbContext = Domain.DbContext;
-    using log4net.Config;
 
     class Program
     {
         ILog log;
-        IServiceLocator serviceLocator;
+        IServiceProvider serviceProvider;
 
         Program()
         {
             log4net.Config.XmlConfigurator.Configure();
-            log = log4net.LogManager.GetLogger("LittleLeagueLog");
+            log = log4net.LogManager.GetLogger("LittleLeagueLog"); 
 
             var kernel = new StandardKernel();
             kernel.Bind<ILog>().ToConstant(log);
 
-            serviceLocator = new ServiceLocator(kernel);
+            serviceProvider = kernel;
         }
 
         static void Main(string[] args)
@@ -45,12 +48,9 @@ namespace Client
 
         void DeleteTeams()
         {
-            using (var db = new DbContext("TestUser2", serviceLocator))
+            using (var db = new DbContext(serviceProvider))
             {
-                foreach (var team in db.Teams)
-                {
-                    db.Teams.Remove(team);
-                }
+                db.Teams.ForEach(team => db.Teams.Remove(team));
                 db.SaveChanges();
             }
             log.Info("Deleted teams.");
@@ -58,10 +58,12 @@ namespace Client
 
         void CreateTeamsAndPlayers()
         {
-            using (var db = new DbContext("TestUser2", serviceLocator))
+            // Setting up a different principle to illustrate how createBy and lastUpdateBy varies in the database.
+            Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("TestUser1", "Generic"), new string[] { "User" });
+            using (var db = new DbContext(serviceProvider))
             {
-                var team = db.Teams.Add(new Team("Hawks", serviceLocator));
-                team.AddPlayer(new Player("John", "Doe", team, serviceLocator));
+                var team = db.Teams.Add(new Team("Hawks", serviceProvider));
+                team.AddPlayer(new Player("John", "Doe", team, serviceProvider));
                 db.SaveChanges();
             }
             log.Info("Teams and players created.");
@@ -69,16 +71,16 @@ namespace Client
 
         void RegisterPlayers()
         {
+            // Setting up a different principle to illustrate how createBy and lastUpdateBy varies in the database.
+            Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("TestUser2", "Generic"), new string[] { "User" });
+
+            // An example of transaction scope being used.
             using (var scope = new TransactionScope())
             {
-                using (var db = new DbContext("TestUser1", serviceLocator))
+                using (var db = new DbContext(serviceProvider))
                 {
-
-                    var team = db.Teams.Where(x => x.Name == "Hawks").Single();
-                    foreach (var player in team.Players)
-                    {
-                        player.Register();
-                    }
+                    var team = db.Teams.Where(x => x.Name == "Hawks").Include(x=>x.Players).Single();
+                    team.Players.ForEach(player => player.Register());
                     db.SaveChanges();
                 }
                 scope.Complete();
@@ -88,11 +90,12 @@ namespace Client
 
         void ReadTeamsAndPlayers()
         {
+            // Injection will not be used because we are using the default constructor of DbContext.
             using (var db = new DbContext())
             {
                 foreach (var team in db.Teams.Include(x => x.Players))
                 {
-                    log.Info("# Team: " + team.Name);
+                    log.InfoFormat("# Team: {0}", team.Name);
                     foreach (var player in team.Players)
                     {
                         log.InfoFormat("  - Player: {0} {1}", player.FirstName, player.LastName);

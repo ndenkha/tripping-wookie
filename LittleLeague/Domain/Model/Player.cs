@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain
+namespace Domain.Model
 {
     public class Player : IServiceConsumer, IAuditable
     {
@@ -23,17 +23,17 @@ namespace Domain
         public string LastUpdatedBy { get; set; }
         public DateTime LastUpdatedDate { get; set; }
 
-        public Player()
+        private Player()
         {
             //For use by entity framework only.
         }
 
-        public Player(string firstName, string lastName, Team team, IServiceLocator serviceLocator)
+        public Player(string firstName, string lastName, Team team, IServiceProvider serviceProvider)
         {
             this.FirstName = firstName;
             this.LastName = lastName;
             this.Team = team;
-            ((IServiceConsumer)this).Accept(serviceLocator);
+            ((IServiceConsumer)this).Accept(serviceProvider);
         }
 
         public void Register()
@@ -50,9 +50,9 @@ namespace Domain
             log.Info("Unregistered.");
         }
 
-        void IServiceConsumer.Accept(IServiceLocator serviceLocator)
+        void IServiceConsumer.Accept(IServiceProvider serviceProvider)
         {
-            log = serviceLocator.GetService<ILog>();
+            log = serviceProvider.GetService<ILog>();
         }
     }
 }
