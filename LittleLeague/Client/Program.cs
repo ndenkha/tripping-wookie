@@ -108,7 +108,7 @@ namespace Client
         {
             log.Info("Reading players...");
             // Injection will not be used because we are using the default constructor of DbContext.
-            using (var db = new DbContext())
+            using (var db = new DbContext(kernel))
             {
                 foreach (var team in db.Teams.Include(x => x.Players))
                 {

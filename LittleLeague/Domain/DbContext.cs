@@ -21,16 +21,10 @@ namespace Domain
 
         // Should be used for write scenarios.
         public DbContext(IKernel serviceProvider)
-            : this()
+            : base("LittleLeague")
         {
             this.kernel = serviceProvider;
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
-        }
-
-        // Should only be used for readonly scenarios.
-        public DbContext()
-            : base("LittleLeague")
-        {
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
