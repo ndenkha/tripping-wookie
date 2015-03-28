@@ -8,17 +8,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Model
 {
-    public class Team : IDependencyConsumer, IAuditable
+    public class Team : EntityBase
     {
-        ILog log;
-
         public int TeamId { get; private set; }
         public string Name { get; private set; }
         public virtual ICollection<Player> Players { get; private set; }
-        public string CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public string LastUpdatedBy { get; set; }
-        public DateTime LastUpdatedDate { get; set; }
 
         Team()
         {
@@ -26,10 +20,10 @@ namespace Domain.Model
         }
 
         public Team(string name, IKernel kernel)
+            : base(kernel)
         {
             this.Name = name;
             this.Players = new List<Player>();
-            ((IDependencyConsumer)this).Accept(kernel);
         }
 
         public Team AddPlayer(Player player)
@@ -43,11 +37,6 @@ namespace Domain.Model
         {
             var unregisteredPlayers = Players.Where(x => x.IsRegistered == false);
             unregisteredPlayers.ForEach(player => player.Register());
-        }
-
-        void IDependencyConsumer.Accept(IKernel kernel)
-        {
-            log = (ILog)kernel.GetService(typeof(ILog));
         }
     }
 }
