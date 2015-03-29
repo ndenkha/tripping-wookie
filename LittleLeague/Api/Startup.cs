@@ -17,23 +17,11 @@ namespace Api
     {
         public void Configuration(IAppBuilder app)
         {
-            app.Map("api", apiApp =>
-            {
-                apiApp.UseNinjectMiddleware(() => RegisterServicesForREST(IoCConfig.CreateKernel()));
-                apiApp.UseNinjectWebApi(WebApiConfig.Configure());
-            }).Map("odata", odataApp =>
-            {
-                odataApp.UseNinjectMiddleware(() => RegisterServicesForREST(IoCConfig.CreateKernel()));
-                odataApp.UseNinjectWebApi(WebApiConfig.Configure());
-            });
+            app.UseNinjectMiddleware(() => RegisterServices(IoCConfig.CreateKernel()));
+            app.UseNinjectWebApi(WebApiConfig.Configure());
         }
 
-        private IKernel RegisterServicesForREST(IKernel kernel)
-        {
-            return kernel;
-        }
-
-        private IKernel RegisterServicesForODATA(IKernel kernel)
+        private IKernel RegisterServices(IKernel kernel)
         {
             return kernel;
         }
