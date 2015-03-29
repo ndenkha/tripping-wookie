@@ -26,7 +26,7 @@ namespace Domain.Model
         public DateTime LastUpdatedDate { get; set; }
 
         Lazy<IEventPublisher> eventPublisher;
-        protected IEventPublisher EventPublisher
+        IEventPublisher EventPublisher
         {
             get { return eventPublisher.Value; }
         }

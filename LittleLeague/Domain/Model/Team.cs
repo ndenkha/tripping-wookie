@@ -24,13 +24,13 @@ namespace Domain.Model
         public DateTime LastUpdatedDate { get; set; }
 
         Lazy<ITeamConfiguration> teamConfiguration;
-        protected ITeamConfiguration TeamConfiguration
+        ITeamConfiguration TeamConfiguration
         {
             get { return teamConfiguration.Value; }
         }
 
         Lazy<IEventPublisher> eventPublisher;
-        protected IEventPublisher EventPublisher
+        IEventPublisher EventPublisher
         {
             get { return eventPublisher.Value; }
         }
