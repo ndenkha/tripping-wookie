@@ -1,4 +1,5 @@
 ﻿using _3rdPartyApis.Configuration;
+using _3rdPartyApis.Eventing;
 using log4net;
 using Ninject;
 using System;
@@ -9,31 +10,41 @@ using System.Threading.Tasks;
 
 namespace Domain.Model
 {
-    public class Team : EntityBase
+    public class Team : IDependencyConsumer, IAuditable
     {
+        IKernel kernel;
+
         public int TeamId { get; private set; }
         public string Name { get; private set; }
         public virtual ICollection<Player> Players { get; private set; }
 
-        ITeamConfiguration teamConfiguration;
+        public string CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string LastUpdatedBy { get; set; }
+        public DateTime LastUpdatedDate { get; set; }
+
+        Lazy<ITeamConfiguration> teamConfiguration;
         protected ITeamConfiguration TeamConfiguration
         {
-            get
-            {
-                if (null == teamConfiguration)
-                    teamConfiguration = (ITeamConfiguration)kernel.Get(typeof(ITeamConfiguration));
-                return teamConfiguration;
-            }
+            get { return teamConfiguration.Value; }
+        }
+
+        Lazy<IEventPublisher> eventPublisher;
+        protected IEventPublisher EventPublisher
+        {
+            get { return eventPublisher.Value; }
         }
 
         Team()
         {
-            //For use by entity framework only.
+            teamConfiguration = new Lazy<ITeamConfiguration>(() => kernel.Get<ITeamConfiguration>());
+            eventPublisher = new Lazy<IEventPublisher>(() => kernel.Get<IEventPublisher>());
         }
 
         public Team(string name, IKernel kernel)
-            : base(kernel)
+            : this()
         {
+            this.kernel = kernel;
             this.Name = name;
             this.Players = new List<Player>();
         }
@@ -50,6 +61,11 @@ namespace Domain.Model
         {
             var unregisteredPlayers = Players.Where(x => x.IsRegistered == false);
             unregisteredPlayers.ForEach(player => player.Register());
+        }
+
+        void IDependencyConsumer.Accept(IKernel kernel)
+        {
+            this.kernel = kernel;
         }
 
         void EnforceMaxPlayerLimit()

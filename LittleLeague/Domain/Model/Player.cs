@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using _3rdPartyApis.Eventing;
+using log4net;
 using Ninject;
 using System;
 using System.Collections.Generic;
@@ -8,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Model
 {
-    public class Player : EntityBase
+    public class Player : IDependencyConsumer, IAuditable
     {
+        IKernel kernel;
+
         public int PlayerId { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
@@ -17,15 +20,26 @@ namespace Domain.Model
         public DateTime? RegistrationDate { get; private set; }
         public int TeamId { get; private set; }
         public Team Team { get; private set; }
+        public string CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string LastUpdatedBy { get; set; }
+        public DateTime LastUpdatedDate { get; set; }
+
+        Lazy<IEventPublisher> eventPublisher;
+        protected IEventPublisher EventPublisher
+        {
+            get { return eventPublisher.Value; }
+        }
 
         Player()
         {
-            //For use by entity framework only.
+            eventPublisher = new Lazy<IEventPublisher>(() => kernel.Get<IEventPublisher>());
         }
 
         public Player(string firstName, string lastName, Team team, IKernel kernel)
-            : base(kernel)
+            : this()
         {
+            this.kernel = kernel;
             this.FirstName = firstName;
             this.LastName = lastName;
             this.Team = team;
@@ -41,8 +55,13 @@ namespace Domain.Model
         public void UnRegister()
         {
             IsRegistered = false;
-            RegistrationDate = null; 
+            RegistrationDate = null;
             EventPublisher.Publish(string.Format("Unregistered {0} {1}.", FirstName, LastName));
+        }
+
+        void IDependencyConsumer.Accept(IKernel kernel)
+        {
+            this.kernel = kernel;
         }
     }
 }
