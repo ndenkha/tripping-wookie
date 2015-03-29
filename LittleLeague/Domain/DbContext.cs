@@ -20,10 +20,10 @@ namespace Domain
         public IDbSet<Team> Teams { get; set; }
 
         // Should be used for write scenarios.
-        public DbContext(IKernel serviceProvider)
+        public DbContext(IKernel kernel)
             : base("LittleLeague")
         {
-            this.kernel = serviceProvider;
+            this.kernel = kernel;
             ((IObjectContextAdapter)this).ObjectContext.ObjectMaterialized += ObjectContext_ObjectMaterialized;
         }
 
