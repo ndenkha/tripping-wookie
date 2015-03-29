@@ -18,34 +18,31 @@ namespace Domain.Model
         public string LastUpdatedBy { get; set; }
         public DateTime LastUpdatedDate { get; set; }
 
-        ILog log;
+        Lazy<ILog> log;
         protected ILog Log
         {
             get
             {
-                if (null == log)
-                    log = (ILog)kernel.Get(typeof(ILog));
-                return log;
+                return log.Value;
             }
         }
 
-        IEventPublisher eventPublisher;
+        Lazy<IEventPublisher> eventPublisher;
         protected IEventPublisher EventPublisher
         {
             get
             {
-                if (null == eventPublisher)
-                    eventPublisher = (IEventPublisher)kernel.Get(typeof(IEventPublisher));
-                return eventPublisher;
+                return eventPublisher.Value;
             }
         }
 
         protected EntityBase()
         {
-            // Needed for the private default contructors of entities.
+            eventPublisher = new Lazy<IEventPublisher>(() => kernel.Get<IEventPublisher>());
+            log = new Lazy<ILog>(() => kernel.Get<ILog>());
         }
 
-        protected EntityBase(IKernel kernel)
+        protected EntityBase(IKernel kernel) : this()
         {
             ((IDependencyConsumer)this).Accept(kernel);
         }
