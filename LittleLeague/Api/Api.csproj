@@ -125,6 +125,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SoapUI\LittleLeagueApi-soapui-project.xml" />
+    <Content Include="SoapUI\README.txt" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

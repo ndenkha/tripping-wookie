@@ -8,6 +8,8 @@ using System.Web.Http;
 namespace Api.Controllers
 {
     using Domain.Model;
+    using System.Security.Principal;
+    using System.Threading;
     using DbContext = Domain.DbContext;
 
     [RoutePrefix("api")]
@@ -54,6 +56,9 @@ namespace Api.Controllers
         [Route("teams")]
         public IHttpActionResult PostTeam([FromBody]string name)
         {
+            //In the real world, we'd have security, but we'll have to fake this for now to illustrate.
+            Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity("TeamCreator", "Generic"), new string[] { "User" });
+            
             using (var db = new DbContext(kernel))
             {
                 db.Teams.Add(new Team(name, kernel));
